@@ -1,8 +1,8 @@
-# APPLICATION USING TCP SOCKETS - CREATING FOR CHAT CLIENT-SERVER
+# APPLICATION USING TCP SOCKETS - FILE TRANSFER PROGRAM
 
-# EXP: 9
+# EXP: 10
 
-# DATE:03-05-2023
+# DATE:10-05-2023
 
 # AIM:
 To write a python program for creating Chat using TCP Sockets Links.
@@ -18,36 +18,64 @@ server
 # CLIENT:
 ```python3
 import socket
-s=socket.socket()
-s.connect(('localhost',8000))
-while True:
-   msg=input("Client > ")
-   s.send(msg.encode())
-   print("Server > ",s.recv(1024).decode())
+s = socket.socket()
+host = socket.gethostname()
+port = 60000
+s.connect((host, port))
+s.send("Hello server!".encode())
+with open('received_file', 'wb') as f:
+ while True:
+  print('receiving data...')
+  data = s.recv(1024)
+  print('data=%s', (data))
+  if not data:
+    break
+  f.write(data)
+f.close()
+print('Successfully get the file')
+s.close()
+print('connection closed')
   ```
 # SERVER:
 ```python3
 import socket
-s=socket.socket()
-s.bind(('localhost',8000))
+
+port = 60000
+s = socket.socket()
+host = socket.gethostname()
+s.bind((host, port))
 s.listen(5)
-c,addr=s.accept()
+
 while True:
-   ClientMessage=c.recv(1024).decode()
-   print("Client > ",ClientMessage)
-   msg=input("Server > ")
-   c.send(msg.encode())
+    conn, addr = s.accept()
+    data = conn.recv(1024)
+    print('Server received', repr(data))
+    filename = 'myfile.txt'  # Replace 'path/to' with the actual path to the file
+    try:
+        with open(filename, 'rb') as f:
+            l = f.read(1024)
+            while l:
+                conn.send(l)
+                print('Sent', repr(l))
+                l = f.read(1024)
+        print('Done sending')
+    except FileNotFoundError:
+        print(f'File {filename} not found.')
+    
+    conn.send('Thank you for connecting'.encode())
+    conn.close()
+
 ```
    
 # CLIENT OUTPUT : 
-![client9](https://github.com/ARUNKUMART9968/EX-9/assets/121215794/ac015ad3-69ad-4236-873f-b7b527d684d8)
 
+![IMG-20230527-WA0022](https://github.com/ARUNKUMART9968/EX-10/assets/121215794/d0ece23e-6797-48d8-ba83-fdfeafc1faea)
 
 # SERVER OUTPUT :
-![server9](https://github.com/ARUNKUMART9968/EX-9/assets/121215794/c4fb8334-d920-4fab-9d8f-057f699bfb62)
 
+![IMG-20230527-WA0023](https://github.com/ARUNKUMART9968/EX-10/assets/121215794/a69801ed-4dad-42b7-a5b1-b79d05e4d0d3)
 
 
 # RESULT:
-Thus, the python program for creating Chat using TCP Sockets Links was successfully
-created and executed.
+Thus, the python program for creating File Transfer using TCP Sockets Links was
+successfully created and executed.
